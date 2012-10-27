@@ -28,14 +28,11 @@ namespace XLinkCSharpClient
         static int Main(string[] args)
         {
             if(args.Length < 2){
-                outputLine("Missing Parameter");
-                outputLine("Usage: " + programname + " {workingDirectory} {openengsb.context}");
-                return EXIT_FAILURE;
+                exitProgramWithError("Missing Parameter\nUsage: " + programname + " {workingDirectory} {openengsb.context}");
             }
             if (!setWorkingDirectory(args[0]))
             {
-                outputLine("Supplied Path \"" + args[0] + "\" is not a directory.");
-                return EXIT_FAILURE;
+                exitProgramWithError("Supplied Path \"" + args[0] + "\" is not a directory.");
             }
             setOpenEngSBContext(args[1]);
 
@@ -99,10 +96,23 @@ namespace XLinkCSharpClient
                 }
                 Console.Write("Insert your command:");
             }
-
-            outputLine("Program is closing.");
-            return EXIT_SUCCESS;
+			exitProgramWithSucces();
+			return 0;
         }
+        
+        private static void exitProgramWithSucces(){
+            outputLine("Program is closing.");
+            Console.WriteLine("Press any key to close...");
+            Console.ReadKey();
+            System.Environment.Exit(EXIT_SUCCESS);      	
+        }
+
+        private static void exitProgramWithError(String errorMsg){
+            outputLine(errorMsg);
+            Console.WriteLine("Press any key to close...");
+            Console.ReadKey();
+            System.Environment.Exit(EXIT_FAILURE);    	
+        }        
 
         private static void processHelp()
         {
