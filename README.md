@@ -20,7 +20,7 @@ How to configure & build
 
 - Clone this project
 
-- Start the OpenEngSB server and make sure that the JMS-Port bundle is installed
+- Start the OpenEngSB server and make sure that the JMS-Port bundle is installed<br/>
 Note that, if server and client are not running on the same machine, the xlink base-URL (e.g. contains also the server URL) must
 be configured in $OPENENGSB_HOME$/etc/org.openengsb.core.services.internal.connectormanager.cfg
 
