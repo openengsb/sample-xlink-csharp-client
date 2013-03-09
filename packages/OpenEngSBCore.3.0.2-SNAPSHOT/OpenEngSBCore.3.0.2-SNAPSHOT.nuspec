@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>OpenEngSBCore</id>
+    <version>3.0.2-SNAPSHOT</version>
+    <authors>OpenEngSB</authors>
+    <owners>OpenEngSB</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>OpenEngSBCore dll</description>
+    <releaseNotes>Release the .Net Bridge</releaseNotes>
+    <copyright>OpenEngSB 2012</copyright>
+    <references>
+      <reference file="OpenEngSBCore.dll" />
+    </references>
+  </metadata>
+</package>
