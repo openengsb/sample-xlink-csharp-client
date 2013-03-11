@@ -15,7 +15,7 @@ namespace Org.Openengsb.XLinkCSharpClient.Model
         public string directoryOfFile;
         public string wholePath;
         public string content;
-
+        
         public WorkingDirectoryFile(String input_wholePath)
         {
             FileInfo fi = new FileInfo(input_wholePath);

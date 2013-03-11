@@ -16,7 +16,6 @@
     <NoStdLib>False</NoStdLib>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <SourceAnalysisOverrideSettingsFile>D:\Dokumente und Einstellungen\User\Anwendungsdaten\ICSharpCode/SharpDevelop4\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
     <RunCodeAnalysis>False</RunCodeAnalysis>
     <RunSourceAnalysis>False</RunSourceAnalysis>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -48,31 +47,32 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Apache.NMS, Version=1.5.1.2739, Culture=neutral, PublicKeyToken=82756feee3957618, processorArchitecture=MSIL">
+    <Reference Include="Apache.NMS">
       <HintPath>..\packages\Apache.NMS.1.5.1\lib\net40\Apache.NMS.dll</HintPath>
     </Reference>
-    <Reference Include="Apache.NMS.ActiveMQ, Version=1.5.6.2746, Culture=neutral, PublicKeyToken=82756feee3957618, processorArchitecture=MSIL">
+    <Reference Include="Apache.NMS.ActiveMQ">
       <HintPath>..\packages\Apache.NMS.ActiveMQ.1.5.6\lib\net40\Apache.NMS.ActiveMQ.dll</HintPath>
     </Reference>
-    <Reference Include="Implementation, Version=3.0.0.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Org.Openengsb.Loom.CSharp.Bridge.Implementation">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Org.Openengsb.Loom.CSharp.Bridge.Implementation.3.0.0.4-SNAPSHOT\lib\net40\Implementation.dll</HintPath>
     </Reference>
-    <Reference Include="Interface, Version=3.0.0.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Org.Openengsb.Loom.CSharp.Bridge.Interface">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Org.Openengsb.Loom.CSharp.Bridge.Interface.3.0.0.4-SNAPSHOT\lib\net40\Interface.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+    <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OOSourceCodeDomain, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="OOSourceCodeDomain">
       <HintPath>..\packages\OOSourceCodeDomain.3.0.0-SNAPSHOT\lib\OOSourceCodeDomain.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenEngSBCore, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenEngSBCore.3.0.2-SNAPSHOT\lib\OpenEngSBCore.dll</HintPath>
+    </Reference>  
+    <Reference Include="OpenEngSBCore">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\OpenEngSBCore.3.0.3.1-SNAPSHOT\lib\OpenEngSBCore.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -100,6 +100,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
