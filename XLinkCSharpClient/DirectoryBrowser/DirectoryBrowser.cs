@@ -9,7 +9,7 @@ using Org.Openengsb.XLinkCSharpClient.Model;
 namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
 {
     /// <summary>
-    /// TODO TBW
+    /// Specifies the file-browse functionality, in the defined working directory.
     /// </summary>
     class DirectoryBrowser
     {
@@ -57,7 +57,7 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
         {
             if (wdFiles.Count != 0)
             {
-                outputLine("Files of the working directory");
+                outputLine("Files of the working directory:\n");
             }
             else
             {
@@ -65,8 +65,9 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
             }
             foreach (WorkingDirectoryFile wdf in wdFiles)
             {
-                outputLine(wdf.fileName + " (" + wdf.directoryOfFile + ")");
+                outputLine("- " + wdf.fileName + " (" + wdf.directoryOfFile + ")");
             }
+            outputLine("");
         }
 
         /// <summary>
@@ -151,6 +152,7 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
             WorkingDirectoryFile searchedFile = null;
             foreach (WorkingDirectoryFile wdf in wdFiles)
             {
+                //TODO make search less strict
                 if (wdf.fileName.Equals(fileName))
                 {
                     searchedFile = wdf;

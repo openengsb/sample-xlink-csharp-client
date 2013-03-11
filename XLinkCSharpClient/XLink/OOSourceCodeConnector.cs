@@ -10,7 +10,8 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
 {
 
     /// <summary>
-    /// TODO TBW
+    /// ConnectorImplementaiton of the OOSourecCode Domain, defined at the OpenEngSB. 
+    /// Since the Domain defines XLink methods, the XLink functionality is implemented here.
     /// </summary>
     class OOSourceCodeConnector : IOOSourceCodeDomainSoap11Binding
     {
@@ -27,10 +28,14 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
 
         public void openXLinks(object[] matchingObjects, string viewId)
         {
+            if (!Program.viewId.Equals(viewId))
+            {
+                outputLine("An XLink matching was triggerd with an unknown viewId.");
+            } 
+            
             Console.WriteLine("matchingObjects " + matchingObjects.Length);
-            Console.WriteLine("viewId " + viewId);
 
-            //TODO check view 
+
             //TODO convertMatchingObjects
 
             String className = "test";

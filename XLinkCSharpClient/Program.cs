@@ -9,7 +9,7 @@ using Org.Openengsb.XLinkCSharpClient.SearchLogic;
 namespace Org.Openengsb.XLinkCSharpClient
 {
     /// <summary>
-    /// TODO TBW
+    /// Programm entry point. Controlls the user interaction.
     /// </summary>
     class Program
     {
@@ -23,7 +23,7 @@ namespace Org.Openengsb.XLinkCSharpClient
         public static DirectoryBrowser directoryBrowser;
 
         /*Context to be used at the OpenEngSB*/
-        private static String openengsbContext;
+        public static String openengsbContext;
 
         /*ConnectionManager to the OpenEngSB, also creates XLinks*/
         public static OpenEngSBConnectionManager openengsbConnectionManager;
@@ -33,11 +33,12 @@ namespace Org.Openengsb.XLinkCSharpClient
         private static string xlinkServerURL = "tcp://localhost.:6549";
         private static string hostIp = "127.0.0.1";
         public static string viewId = "C#SourceCode";
+        private static string classNameOfOpenEngSBModel = "org.openengsb.domain.OOSourceCode.model.OOClass";
 
         [STAThread]
         static int Main(string[] args)
         {
-            OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname, hostIp);
+            OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname, hostIp, classNameOfOpenEngSBModel);
             openengsbConnectionManager = OpenEngSBConnectionManager.getInstance();
             directoryBrowser = new DirectoryBrowser();
 
@@ -49,6 +50,7 @@ namespace Org.Openengsb.XLinkCSharpClient
                 exitProgramWithError("Supplied Path \"" + args[0] + "\" is not a directory.");
             }
             openengsbContext = args[1];
+            printWelcomeInformation();
             connectToOpenEngSBAndRegisterForXLink();
 
             outputLine("Insert your command:");
@@ -67,9 +69,9 @@ namespace Org.Openengsb.XLinkCSharpClient
                     string param = lineParams[1];
                     if (directoryBrowser.setWorkingDirectory(param))
                     {
-                        outputLine("WorkingDirectory changed.");        
-                    }
-                    directoryBrowser.reloadListOfWorkingDirectoryFiles();
+                        outputLine("WorkingDirectory changed.");
+                        directoryBrowser.reloadListOfWorkingDirectoryFiles();
+                    }           
                 }
                 else if (line.Equals("displayWD"))
                 {
@@ -149,7 +151,7 @@ namespace Org.Openengsb.XLinkCSharpClient
         /// </summary>
         private static void printWelcomeInformation()
         {
-            outputLine("Modelclass Browser is running.");
+            outputLine("C# Model Browser is running.");
             directoryBrowser.displayWorkingDirectory();
             directoryBrowser.displaySupportedFileTypes();
             directoryBrowser.displaycurrentFileType();
@@ -176,6 +178,10 @@ namespace Org.Openengsb.XLinkCSharpClient
         /// </summary>
         private static void disconnectFromXLinkAndOpenEngSB()
         {
+            if (!openengsbConnectionManager.isConnected())
+            {
+                return;
+            }
             try
             {
                 openengsbConnectionManager.disconnect();
@@ -213,18 +219,22 @@ namespace Org.Openengsb.XLinkCSharpClient
         /// </summary>
         private static void processHelp()
         {
-            outputLine("Available Commands:");
-            outputLine("\tchangeFT <filetype> - changes the current Filetype, must be a supported filetype");
-            outputLine("\n\tchangeWD <directoryPath> - changes the current WorkingDirectory, must be a correct directoryPath");
-            outputLine("\n\tdisplayFT - displays the current filetype");
-            outputLine("\n\tdisplaySupportedFT - displays all supported filetypes");
-            outputLine("\n\tdisplayWD - displays the current WorkingDirectory");
-            outputLine("\n\texit - closes the program");
-            outputLine("\n\thelp - displays this help");
-            outputLine("\n\tlist - lists all files of the defined filetype in the workingDirectory");
-            outputLine("\n\topen <filename> - opens the given file in the standart editor");
-            outputLine("\n\treload - reloads filelist from the workingDirectory");
-            outputLine("\n\txlink <filename> - copies the xlink of the specified file to the clipboard"); 
+            outputLine("\nAvailable Commands:");
+
+            /*Commented information about commands since they are not needed in controlled experiment*/
+
+            //outputLine("\nchangeFT <filetype> - changes the current Filetype, must be a supported filetype");
+            //outputLine("\nchangeWD <directoryPath> - changes the current WorkingDirectory, must be a correct directoryPath");
+            //outputLine("\ndisplayFT - displays the current filetype");
+            //outputLine("\ndisplaySupportedFT - displays all supported filetypes");
+            //outputLine("\ndisplayWD - displays the current WorkingDirectory");
+            outputLine("\nexit - closes the program");
+            outputLine("\nhelp - displays this help");
+            outputLine("\nlist - lists all files of the defined filetype in the workingDirectory");
+            outputLine("\nopen <filename> - opens the given file in the standard editor");
+            //outputLine("\nreload - reloads filelist from the workingDirectory");
+            outputLine("\nxlink <filename> - copies the xlink of the specified file to the clipboard");
+            outputLine("");
         }
 
         private static void outputLine(string line)

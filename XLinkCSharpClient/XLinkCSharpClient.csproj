@@ -36,7 +36,7 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <StartAction>Project</StartAction>
-    <StartArguments>C:\temp\modelBrowser foo</StartArguments>
+    <StartArguments>C:\temp\oomodelbrowser foo</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -69,7 +69,7 @@
     </Reference>
     <Reference Include="OOSourceCodeDomain">
       <HintPath>..\packages\OOSourceCodeDomain.3.0.0-SNAPSHOT\lib\OOSourceCodeDomain.dll</HintPath>
-    </Reference>  
+    </Reference>
     <Reference Include="OpenEngSBCore">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenEngSBCore.3.0.3.1-SNAPSHOT\lib\OpenEngSBCore.dll</HintPath>
@@ -83,6 +83,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
@@ -91,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectoryBrowser\DirectoryBrowser.cs" />
+    <Compile Include="XLink\LinkingUtils.cs" />
     <Compile Include="XLink\OOSourceCodeConnector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
