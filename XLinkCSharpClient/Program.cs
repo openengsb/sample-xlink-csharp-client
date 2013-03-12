@@ -23,7 +23,7 @@ namespace Org.Openengsb.XLinkCSharpClient
         public static DirectoryBrowser directoryBrowser;
 
         /*Context to be used at the OpenEngSB*/
-        public static String openengsbContext;
+        private static String openengsbContext = "foo";
 
         /*ConnectionManager to the OpenEngSB, also creates XLinks*/
         public static OpenEngSBConnectionManager openengsbConnectionManager;
@@ -38,12 +38,12 @@ namespace Org.Openengsb.XLinkCSharpClient
         [STAThread]
         static int Main(string[] args)
         {
-            OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname, hostIp, classNameOfOpenEngSBModel);
+            OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname, hostIp, classNameOfOpenEngSBModel, openengsbContext);
             openengsbConnectionManager = OpenEngSBConnectionManager.getInstance();
             directoryBrowser = new DirectoryBrowser();
 
-            if(args.Length < 2){
-                exitProgramWithError("Missing Parameter\nUsage: " + programname + " {workingDirectory} {openengsb.context}");
+            if(args.Length < 1){
+                exitProgramWithError("Missing Parameter\nUsage: " + programname + " {workingDirectory}");
             }
             if (!directoryBrowser.setWorkingDirectory(args[0]))
             {
@@ -51,6 +51,7 @@ namespace Org.Openengsb.XLinkCSharpClient
             }
             openengsbContext = args[1];
             printWelcomeInformation();
+           
             connectToOpenEngSBAndRegisterForXLink();
 
             outputLine("Insert your command:");
@@ -167,7 +168,7 @@ namespace Org.Openengsb.XLinkCSharpClient
             {
                 openengsbConnectionManager.connectToOpenEngSbWithXLink();
             }
-            catch (Apache.NMS.NMSConnectionException e)
+            catch
             {
                 outputLine("Connect failed.");
             }
@@ -186,7 +187,7 @@ namespace Org.Openengsb.XLinkCSharpClient
             {
                 openengsbConnectionManager.disconnect();
             }
-            catch (Exception e)
+            catch
             {
                 outputLine("Disconnect failed.");
             }

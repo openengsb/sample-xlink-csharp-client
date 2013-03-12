@@ -31,7 +31,7 @@ namespace Org.Openengsb.XLinkCSharpClient.Model
             bool classOpen = false;
             int bracketCount = 0;
 
-            Regex _regex = new Regex(@".*class ([a-zA-Z0-9_]+).*");
+            Regex _regex = new Regex(@".*namespace [a-zA-Z0-9_\.]+.*");
 
             while ((line = reader.ReadLine()) != null)
             {

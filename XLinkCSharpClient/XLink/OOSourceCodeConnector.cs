@@ -20,49 +20,33 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         {
         }
 
-
+        /// <summary>
+        /// TODO TBW
+        /// </summary>
         public void onRegisteredToolsChanged(XLinkConnector[] currentlyInstalledTools)
         {
             Console.WriteLine("onRegisteredToolsChanged " + currentlyInstalledTools.Length);
         }
 
+        /// <summary>
+        /// TODO TBW
+        /// </summary>
         public void openXLinks(object[] matchingObjects, string viewId)
         {
             if (!Program.viewId.Equals(viewId))
             {
                 outputLine("An XLink matching was triggerd with an unknown viewId.");
             } 
-            
-            Console.WriteLine("matchingObjects " + matchingObjects.Length);
-
-
-            //TODO convertMatchingObjects
-
-            String className = "test";
-
-            WorkingDirectoryFile searchedFile = null;
-            foreach (WorkingDirectoryFile wdf in Program.directoryBrowser.getFilesFromWorkingDirectory())
+            for (int i = 0; i < matchingObjects.Length; i++ )
             {
-                if (wdf.fileName.Equals(className))
-                {
-                    searchedFile = wdf;
-                    break;
-                }
-            }
-
-            //TODO write sophisticated search algorithm
-
-            if (searchedFile != null)
-            {
-                outputLine("opening file due to xlink call...");
-                System.Diagnostics.Process.Start(searchedFile.wholePath);
-            }
-            else
-            {
-                outputLine("openXLink was called with " + className + " but no match was found.");
+                OOClass currentPotentialMatch = (OOClass) matchingObjects[i];
+                Program.directoryBrowser.seachForXLinkMatches(currentPotentialMatch);
             }
         }
 
+        /// <summary>
+        /// TODO TBW
+        /// </summary>
         public void updateClass(OOClass args0)
         {
             outputLine("'updateClass' was triggered from the OpenEngSB");

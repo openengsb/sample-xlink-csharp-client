@@ -26,6 +26,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         private String xlinkServerURL;
         private String domainId;
         private String programname;
+        private String openengsbContext;
 
         /// <summary>
         /// Only possible OpenEngSBConnectionManager instance
@@ -61,7 +62,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         private static IOOSourceCodeDomainSoap11Binding ooSourceConnector;
         private static IDomainFactory factory;
 
-        private OpenEngSBConnectionManager(String xlinkServerURL, String domainId, String programname, String hostIp, string classNameOfOpenEngSBModel)
+        private OpenEngSBConnectionManager(String xlinkServerURL, String domainId, String programname, String hostIp, string classNameOfOpenEngSBModel, String openengsbContext)
         {
             this.xlinkServerURL = xlinkServerURL;
             this.domainId = domainId;
@@ -69,6 +70,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             this.connected = false;
             this.hostIp = hostIp;
             this.classNameOfOpenEngSBModel = classNameOfOpenEngSBModel;
+            this.openengsbContext = openengsbContext;
         }	
 
         /// <summary>
@@ -78,10 +80,11 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         /// <param name="hostIp">IP of the local host</param>
         public static void initInstance(String xlinkBaseUrl,
                 String domainId, String programname,
-                String hostIp, string classNameOfOpenEngSBModel)
+                String hostIp, string classNameOfOpenEngSBModel,
+                String openengsbContext)
         {
             instance = new OpenEngSBConnectionManager(xlinkBaseUrl, domainId,
-                    programname, hostIp, classNameOfOpenEngSBModel);
+                    programname, hostIp, classNameOfOpenEngSBModel, openengsbContext);
         }
 
         /// <summary>
@@ -105,14 +108,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             outputLine("Trying to connect to OpenEngSB and XLink...");
             ooSourceConnector = new OOSourceCodeConnector();
             factory = DomainFactoryProvider.GetDomainFactoryInstance("3.0.0", xlinkServerURL, ooSourceConnector, new ForwardDefaultExceptionHandler());
-            try
-            {
-                connectorUUID = factory.CreateDomainService(domainId);
-            }
-            catch (Exception e)
-            {
-                outputLine("An error happened.");
-            }
+            connectorUUID = factory.CreateDomainService(domainId);
             factory.RegisterConnector(connectorUUID, domainId);
             blueprint = factory.ConnectToXLink(connectorUUID, hostIp, programname, initModelViewRelation());
             connected = true;
@@ -165,7 +161,8 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Creates a XLink to the given WorkingDirectoryFile and copies it to the clipboard. 
+        /// Aborts the creation if no connection to the OpenEngSB is established.
         /// </summary>
         /// <param name="file"></param>
         public void createXLink(WorkingDirectoryFile file)
@@ -187,7 +184,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             String completeUrl = blueprint.baseUrl;
             completeUrl += "&" + blueprint.keyNames.modelClassKeyName + "=" + HttpUtility.UrlEncode(modelInformation.modelClassName);
             completeUrl += "&" + blueprint.keyNames.modelVersionKeyName + "=" + HttpUtility.UrlEncode(modelInformation.versionString);
-            completeUrl += "&" + blueprint.keyNames.contextIdKeyName + "=" + HttpUtility.UrlEncode(Program.openengsbContext);      
+            completeUrl += "&" + blueprint.keyNames.contextIdKeyName + "=" + HttpUtility.UrlEncode(openengsbContext);      
 
             string objectString = convertWorkingDirectoryFileToJSON(file);
             outputLine(objectString);
@@ -197,13 +194,14 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Converts a WorkingDirectoryFile instance to a OOCLass instance and serializes it to String, with JSON
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
         private string convertWorkingDirectoryFileToJSON(WorkingDirectoryFile file)
         {
             OOClass ooClassOfFile = LinkingUtils.convertWorkingDirectoryFileToOpenEngSBModel(file);
+            //TODO check if serialization is correct
             string output = JsonConvert.SerializeObject(ooClassOfFile);
             return output;
         }

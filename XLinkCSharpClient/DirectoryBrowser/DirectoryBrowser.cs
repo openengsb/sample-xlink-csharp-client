@@ -6,6 +6,9 @@ using System.IO;
 
 using Org.Openengsb.XLinkCSharpClient.Model;
 
+using OOSourceCodeDomain;
+using Org.Openengsb.XLinkCSharpClient.XLink;
+
 namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
 {
     /// <summary>
@@ -66,6 +69,13 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
             foreach (WorkingDirectoryFile wdf in wdFiles)
             {
                 outputLine("- " + wdf.fileName + " (" + wdf.directoryOfFile + ")");
+                /*OOClass test = LinkingUtils.convertWorkingDirectoryFileToOpenEngSBModel(wdf);
+                outputLine("package "+test.packageName);
+                outputLine("class " + test.className);
+                for (int i = 0; i < test.attributes.Length;i++) {
+                    outputLine("var "+i+" name "+test.attributes[i].name);
+                    outputLine("var " + i + " type " + test.attributes[i].type);
+                }*/
             }
             outputLine("");
         }
@@ -152,11 +162,21 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
             WorkingDirectoryFile searchedFile = null;
             foreach (WorkingDirectoryFile wdf in wdFiles)
             {
-                //TODO make search less strict
                 if (wdf.fileName.Equals(fileName))
                 {
                     searchedFile = wdf;
                     break;
+                }
+            }
+            if (searchedFile == null)
+            {
+                foreach (WorkingDirectoryFile wdf in wdFiles)
+                {
+                    if (wdf.fileName.Contains(fileName))
+                    {
+                        searchedFile = wdf;
+                        break;
+                    }
                 }
             }
             return searchedFile;
@@ -192,6 +212,14 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Searches through the Files for the most potential Match.
+        /// </summary>
+        public void seachForXLinkMatches(OOClass potentialMatch)
+        {
+            //TODO write search logic
         }
 
 
