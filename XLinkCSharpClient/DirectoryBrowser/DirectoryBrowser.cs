@@ -216,10 +216,84 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
 
         /// <summary>
         /// Searches through the Files for the most potential Match.
+        /// First searches for matching filesnames.
+        /// If no files where found or if more than one file was found, search for matching variables.
         /// </summary>
         public void seachForXLinkMatches(OOClass potentialMatch)
         {
-            //TODO write search logic
+            if (wdFiles.Count == 0)
+            {
+                outputLine("An XLink match was triggered, but the List of loaded files is empty.");
+                return;
+            }
+
+            //first search for matching filesnames
+            List<WorkingDirectoryFile> correspondingFiles = new List<WorkingDirectoryFile>();
+            foreach (WorkingDirectoryFile wdf in wdFiles)
+            {
+                OOClass classModelRepresentation = LinkingUtils.convertWorkingDirectoryFileToOpenEngSBModel(wdf);
+                if (classModelRepresentation.className.ToLower().Contains(potentialMatch.className.ToLower()))
+                {
+                    correspondingFiles.Add(wdf);
+                }
+            }
+
+            WorkingDirectoryFile foundMatch = null;
+
+            //if no files where found or if more than one file was found, compare the matching variables
+            if (correspondingFiles.Count != 1)
+            {
+                if (correspondingFiles.Count == 0)
+                {
+                    correspondingFiles = wdFiles;
+                }
+
+                WorkingDirectoryFile mostPotentialLocalMatch = correspondingFiles[0];
+                int maxMatchValue = matchValueOfClass(mostPotentialLocalMatch, potentialMatch);
+                foreach (WorkingDirectoryFile localWDF in correspondingFiles)
+                {
+                    int currentMatchValue = matchValueOfClass(localWDF, potentialMatch);
+                    if (currentMatchValue > maxMatchValue)
+                    {
+                        maxMatchValue = currentMatchValue;
+                        mostPotentialLocalMatch = localWDF;
+                    }
+                }       
+                if (matchValueOfClass(mostPotentialLocalMatch, potentialMatch) != 0)
+                {
+                    foundMatch = mostPotentialLocalMatch;
+                }
+            }
+            else {
+                foundMatch = correspondingFiles[1];
+            }
+
+            if (foundMatch != null)
+            {
+                outputLine("An XLink match was triggered and a local match was found.");
+                System.Diagnostics.Process.Start(foundMatch.wholePath);
+            }
+            else
+            {
+                outputLine("An XLink match was triggered, but no local match was found.");
+            }
+        }
+
+        /// <summary>
+        /// Returns an int value which indicates, how many many SQLFiels are alike between the two given statements.
+        /// </summary>
+        private int matchValueOfClass(WorkingDirectoryFile wdFileToCheck, OOClass potentialMatch) 
+        {
+            int matchValue = 0;
+            for (int i = 0; i < potentialMatch.attributes.Length; i++)
+            {
+                String attributeRepresentation = potentialMatch.attributes[i].type + " " + potentialMatch.attributes[i].name;
+                if (wdFileToCheck.content.Contains(attributeRepresentation))
+                {
+                    matchValue++;
+                }
+            }
+            return matchValue;
         }
 
 

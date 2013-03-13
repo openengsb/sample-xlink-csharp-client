@@ -187,7 +187,6 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             completeUrl += "&" + blueprint.keyNames.contextIdKeyName + "=" + HttpUtility.UrlEncode(openengsbContext);      
 
             string objectString = convertWorkingDirectoryFileToJSON(file);
-            outputLine(objectString);
             completeUrl += "&" + blueprint.keyNames.identifierKeyName + "=" + HttpUtility.UrlEncode(objectString);
 
             Clipboard.SetText(completeUrl);
@@ -201,8 +200,10 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         private string convertWorkingDirectoryFileToJSON(WorkingDirectoryFile file)
         {
             OOClass ooClassOfFile = LinkingUtils.convertWorkingDirectoryFileToOpenEngSBModel(file);
-            //TODO check if serialization is correct
             string output = JsonConvert.SerializeObject(ooClassOfFile);
+            //HACK: remove isSpecified fields from JSON String
+            output = output.Replace(",\"isStaticSpecified\":true","");
+            output = output.Replace(",\"isFinalSpecified\":true", "");
             return output;
         }
     }

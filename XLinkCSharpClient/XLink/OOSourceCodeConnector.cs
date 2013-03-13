@@ -21,15 +21,16 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Updates the list with local registered software tools.
         /// </summary>
         public void onRegisteredToolsChanged(XLinkConnector[] currentlyInstalledTools)
         {
+            //TODO implement local switch
             Console.WriteLine("onRegisteredToolsChanged " + currentlyInstalledTools.Length);
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Triggers a search for WorkingdirectoryFiles corresponding to incomming matching OOClass instances
         /// </summary>
         public void openXLinks(object[] matchingObjects, string viewId)
         {
@@ -45,7 +46,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Domain Method of OOSourceCodeDomain, not used during example
         /// </summary>
         public void updateClass(OOClass args0)
         {

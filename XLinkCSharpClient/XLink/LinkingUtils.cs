@@ -18,18 +18,19 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         private LinkingUtils() { }
 
         /// <summary>
-        /// TODO TBW 
+        /// Convert the interal model "WorkingDirectoryFile" to the defined OpenEngSBModel "OOClass".
         /// Returns null if resulting instance lacks classname or packagename.
         /// </summary>
         public static OOClass convertWorkingDirectoryFileToOpenEngSBModel(WorkingDirectoryFile wdf)
         {
-            /*Regex to fetch Data*/
+            //Regex to fetch Data
             Regex classRegex = new Regex(@".*class ([a-zA-Z0-9_]+).*");
             Regex packageRegex = new Regex(@".*namespace ([a-zA-Z0-9_\.]+).*");
-            Regex varRegex = new Regex(@" *(public|protected|private) (int|double|float|string|DateTime) ([a-zA-Z0-9_]+) {.*");
+            Regex varRegex = new Regex(@" *(public|protected|private|bool) (int|double|float|string|DateTime) ([a-zA-Z0-9_]+) {.*");
 
             OOClass resultingInstance = new OOClass();
             List<OOVariable> variables = new List<OOVariable>();
+            //not used in example: set this with dummy values
             resultingInstance.methods = "";
 
             string[] contentLines = wdf.content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
@@ -59,6 +60,11 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
                         OOVariable newVar = new OOVariable();
                         newVar.type = match.Groups[2].Value;
                         newVar.name = match.Groups[3].Value;
+                        //not used in example: set this with dummy values
+                        newVar.isFinal = false;
+                        newVar.isFinalSpecified = true;
+                        newVar.isStatic = false;
+                        newVar.isStaticSpecified = true;
                         variables.Add(newVar);
                     }
                 }
@@ -66,7 +72,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             }
             if (resultingInstance.packageName == null || resultingInstance.className == null)
             {
-                /*Instance not correctly set*/
+                //Instance not correctly set
                 return null;
             }
             resultingInstance.attributes = new OOVariable[variables.Count];
