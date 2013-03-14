@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+
 using OOSourceCodeDomain;
 
 using Org.Openengsb.XLinkCSharpClient.Model;
@@ -24,9 +26,8 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         /// Updates the list with local registered software tools.
         /// </summary>
         public void onRegisteredToolsChanged(XLinkConnector[] currentlyInstalledTools)
-        {
-            //TODO implement local switch
-            Console.WriteLine("onRegisteredToolsChanged " + currentlyInstalledTools.Length);
+        {         
+            Program.openengsbConnectionManager.setCurrentlyInstalledTools(currentlyInstalledTools);
         }
 
         /// <summary>
@@ -37,12 +38,12 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             if (!Program.viewId.Equals(viewId))
             {
                 outputLine("An XLink matching was triggerd with an unknown viewId.");
-            } 
-            for (int i = 0; i < matchingObjects.Length; i++ )
-            {
-                OOClass currentPotentialMatch = (OOClass) matchingObjects[i];
-                Program.directoryBrowser.seachForXLinkMatches(currentPotentialMatch);
             }
+
+            //Start matching in thread to avoid timeout at the server
+            SearchForMatchesThread searchThread = new SearchForMatchesThread(matchingObjects);
+            Thread xlinkMatchingThread = new Thread(searchThread.searchForMatchesThread);
+            xlinkMatchingThread.Start();
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Windows.Forms;
 
 using Org.Openengsb.XLinkCSharpClient.Model;
 
@@ -145,8 +146,12 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
             WorkingDirectoryFile searchedFile = searchForFile(fileName);
             if (searchedFile != null)
             {
-                Program.openengsbConnectionManager.createXLink(searchedFile);
-                outputLine("Xlink was copied to clipboard...");
+                String xlink = Program.openengsbConnectionManager.createXLink(searchedFile);
+                if (xlink != null)
+                {
+                    Clipboard.SetText(xlink);
+                    outputLine("Xlink was copied to clipboard...");
+                }               
             }
             else
             {
@@ -265,7 +270,7 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
                 }
             }
             else {
-                foundMatch = correspondingFiles[1];
+                foundMatch = correspondingFiles[0];
             }
 
             if (foundMatch != null)

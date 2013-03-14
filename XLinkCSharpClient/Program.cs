@@ -16,8 +16,12 @@ namespace Org.Openengsb.XLinkCSharpClient
         /*program exit codes - constant*/
         private static readonly int EXIT_SUCCESS = 0;
         private static readonly int EXIT_FAILURE = 1;
+
         /*Programname for usage()*/
         private static readonly string programname = "XLinkCSharpClient";
+
+        /*Program language*/
+        public static readonly string locale = "en";
 
         /*Logic to browse the WorkingDirectory*/
         public static DirectoryBrowser directoryBrowser;
@@ -34,6 +38,7 @@ namespace Org.Openengsb.XLinkCSharpClient
         private static string hostIp = "127.0.0.1";
         public static string viewId = "C#SourceCode";
         private static string classNameOfOpenEngSBModel = "org.openengsb.domain.OOSourceCode.model.OOClass";
+
 
         [STAThread]
         static int Main(string[] args)
@@ -137,11 +142,35 @@ namespace Org.Openengsb.XLinkCSharpClient
                     }
                     directoryBrowser.createXLinkFromFileString(lineParams[1]);
                 }
+                else if (line.Equals("listLocalSwitch"))
+                {
+                    if (!openengsbConnectionManager.isConnected())
+                    {
+                        outputLine("No connection to the OpenEngSB.");
+                        continue;
+                    }
+                    openengsbConnectionManager.listOtherLocalInstalledSoftwareTools();
+                }
+                else if (line.StartsWith("localSwitch"))
+                {
+                    if (!openengsbConnectionManager.isConnected())
+                    {
+                        outputLine("No connection to the OpenEngSB.");
+                        continue;
+                    }
+                    string[] lineParams = line.Split(' ');
+                    if (lineParams.Length < 4)
+                    {
+                        outputLine("missin parameters. Insert 'help' for usage.");
+                        continue;
+                    }
+                    //<programname> <viewId> <filename> 
+                }
                 else
                 {
-                    outputLine("Unknown command \""+line+"\".\nType \"help\" to list all commands.");
+                    outputLine("Unknown command \"" + line + "\".\nType \"help\" to list all commands.");
                 }
-                Console.Write("Insert your command:");
+                outputLine("\nInsert your command:");
             }
 			exitProgramWithSucces();
 			return 0;
@@ -235,6 +264,8 @@ namespace Org.Openengsb.XLinkCSharpClient
             outputLine("\nopen <filename> - opens the given file in the standard editor");
             //outputLine("\nreload - reloads filelist from the workingDirectory");
             outputLine("\nxlink <filename> - copies the xlink of the specified file to the clipboard");
+            outputLine("\nlistLocalSwitch - lists the name and views of all other localy installed software tools with xLink.");
+            outputLine("\nlocalSwitch <programname> <viewId> <filename> - triggers an immediate switch to the given software tools with the xlink of the given file.");
             outputLine("");
         }
 
