@@ -74,8 +74,8 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
                 outputLine("package "+test.packageName);
                 outputLine("class " + test.className);
                 for (int i = 0; i < test.attributes.Length;i++) {
-                    outputLine("var "+i+" name "+test.attributes[i].name);
                     outputLine("var " + i + " type " + test.attributes[i].type);
+                    outputLine("var "+ i +" name "+test.attributes[i].name);                   
                 }*/
             }
             outputLine("");
@@ -293,7 +293,7 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
             for (int i = 0; i < potentialMatch.attributes.Length; i++)
             {
                 String attributeRepresentation = potentialMatch.attributes[i].type + " " + potentialMatch.attributes[i].name;
-                if (wdFileToCheck.content.Contains(attributeRepresentation))
+                if (wdFileToCheck.content.ToLower().Contains(attributeRepresentation.ToLower()))
                 {
                     matchValue++;
                 }

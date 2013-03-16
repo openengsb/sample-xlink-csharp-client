@@ -164,7 +164,7 @@ namespace Org.Openengsb.XLinkCSharpClient
                         outputLine("missin parameters. Insert 'help' for usage.");
                         continue;
                     }
-                    //<programname> <viewId> <filename> 
+                    openengsbConnectionManager.triggerLocalSwitch(lineParams[1], lineParams[2], lineParams[3]);
                 }
                 else
                 {

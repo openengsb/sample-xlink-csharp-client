@@ -61,7 +61,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         /// <summary>
         /// List of other locally installed tools
         /// </summary>
-        private OOSourceCodeDomain.XLinkConnector[] currentlyInstalledTools;
+        private OpenEngSBCore.XLinkConnector[] currentlyInstalledTools;
 
         /*XLink variables*/
         private static IOOSourceCodeDomainSoap11Binding ooSourceConnector;
@@ -146,43 +146,43 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
 
         /// <summary>
         /// Redefines the array with currently installed local software tools. 
-        /// Since the Domain Connector uses OOSourceCodeDomain.XLinkConnector but the blueprint uses OpenEngSBCore.XLinkConnector, the setter must 
-        /// set values manually.
         /// </summary>
         public void setCurrentlyInstalledTools(OpenEngSBCore.XLinkConnector[] newArryOfInstalledTools)
         {
-            currentlyInstalledTools = convertBetweenDLLTypes(newArryOfInstalledTools);
+            currentlyInstalledTools = newArryOfInstalledTools;      
         }
 
         /// <summary>
-        /// TODO TBW
-        /// unterschiedliche DLLS deshalb andere typen
+        /// The DomainConnector and the OpenEngSBCore origin from different DLLs but they both contain the type XLinkConnector.
+        /// This method converts between themm.
         /// </summary>
-        private OOSourceCodeDomain.XLinkConnector[] convertBetweenDLLTypes(OpenEngSBCore.XLinkConnector[] newArryOfInstalledTools)
+        private OpenEngSBCore.XLinkConnector[] convertBetweenDLLTypes(OOSourceCodeDomain.XLinkConnector[] newArryOfInstalledTools)
         {
-            OOSourceCodeDomain.XLinkConnector[] convertedArray = new OOSourceCodeDomain.XLinkConnector[newArryOfInstalledTools.Length];
+            OpenEngSBCore.XLinkConnector[] convertedArray = new OpenEngSBCore.XLinkConnector[newArryOfInstalledTools.Length];
             for (int i = 0; i < newArryOfInstalledTools.Length; i++)
             {
-                convertedArray[i].id = newArryOfInstalledTools[i].id;
+                convertedArray[i] = newArryOfInstalledTools[i].ConvertOSBType<OpenEngSBCore.XLinkConnector>();
+                /*unterschiedliche DLLS deshalb andere typen
+                 * convertedArray[i].id = newArryOfInstalledTools[i].id;
                 convertedArray[i].toolName = newArryOfInstalledTools[i].toolName;
                 convertedArray[i].availableViews = new OOSourceCodeDomain.XLinkConnectorView[newArryOfInstalledTools[i].availableViews.Length];
                 for (int e = 0; e < newArryOfInstalledTools[i].availableViews.Length; e++)
                 {
                     convertedArray[i].availableViews[e].viewId = newArryOfInstalledTools[i].availableViews[e].viewId;
                     convertedArray[i].availableViews[e].name = newArryOfInstalledTools[i].availableViews[e].name;
-                    // TODO set available views map - unterschiedliche DLLS deshalb andere typen
+                    // set available views map - unterschiedliche DLLS deshalb andere typen
                     //convertedArray[i].availableViews[e].descriptions = newArryOfInstalledTools[i].availableViews[e].descriptions;
-                }
+                }*/
             }
             return convertedArray;
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Redefines the array with currently installed local software tools. 
         /// </summary>
         public void setCurrentlyInstalledTools(OOSourceCodeDomain.XLinkConnector[] newArryOfInstalledTools)
         {
-            currentlyInstalledTools = newArryOfInstalledTools;
+            currentlyInstalledTools = convertBetweenDLLTypes(newArryOfInstalledTools);
         }
 
         /// <summary>
@@ -292,25 +292,18 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Triggers the local switching functionality for the given program, using the given viewId ontop of the defined file.
         /// </summary>
         public void triggerLocalSwitch(String programname, String viewId, String filename)
         {
-            OOSourceCodeDomain.XLinkConnector otherLocalTool = findCurrentlyInstalledToolToName(programname);
+            OpenEngSBCore.XLinkConnector otherLocalTool = findCurrentlyInstalledToolToName(programname);
             if (otherLocalTool == null)
             {
                 outputLine("Supplied programname '"+programname+"' unknown.");
                 return;
             }
-            OOSourceCodeDomain.XLinkConnectorView otherLocalView = null;
-            for(int i=0;i<otherLocalTool.availableViews.Length;i++)
-            {
-                if (otherLocalTool.availableViews[i].viewId.Equals(viewId))
-                {
-                    otherLocalView = otherLocalTool.availableViews[i];
-                    break;
-                }
-            }
+            OpenEngSBCore.XLinkConnectorView otherLocalView = findViewToCurrentlyInstalledTool(otherLocalTool, viewId);
+
             if (otherLocalView == null)
             {
                 outputLine("Supplied viewId '" + viewId + "' unknown to program '" + programname + "'.");
@@ -326,7 +319,8 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             else
             {
                 String xlink = createXLink(searchedFile);
-                xlink += "&" + blueprint.connectorId + "&" + blueprint.keyNames.viewIdKeyName + "=" + HttpUtility.UrlEncode(viewId);
+                // TODO remove Hack (hardcoded ConnectorIdKeyname) after correct implementation at OpenEngSB
+                xlink += "&" + "connectorId=" + otherLocalTool.id + "&" + blueprint.keyNames.viewIdKeyName + "=" + HttpUtility.UrlEncode(viewId);
                 WebRequest webRequest = WebRequest.Create(xlink);
                 HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -340,9 +334,40 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             }
         }
 
-        private OOSourceCodeDomain.XLinkConnector findCurrentlyInstalledToolToName(String programname)
+        /// <summary>
+        /// TODO TBW
+        /// </summary>
+        private OpenEngSBCore.XLinkConnector findCurrentlyInstalledToolToName(String programname)
         {
+            if(currentlyInstalledTools == null || currentlyInstalledTools.Length == 0)
+            {
+                return null;
+            }
+            for (int i = 0; i < currentlyInstalledTools.Length; i++)
+            {
+                if (programname.Equals(currentlyInstalledTools[i].toolName))
+                {
+                    return currentlyInstalledTools[i];
+                }
+            }
             return null;
+        }
+
+        /// <summary>
+        /// TODO TBW
+        /// </summary>
+        private OpenEngSBCore.XLinkConnectorView findViewToCurrentlyInstalledTool(OpenEngSBCore.XLinkConnector otherLocalTool, string viewId)
+        {
+            OpenEngSBCore.XLinkConnectorView otherLocalView = null;
+            for (int i = 0; i < otherLocalTool.availableViews.Length; i++)
+            {
+                if (otherLocalTool.availableViews[i].viewId.Equals(viewId))
+                {
+                    otherLocalView = otherLocalTool.availableViews[i];
+                    break;
+                }
+            }
+            return otherLocalView;
         }
     }
 }

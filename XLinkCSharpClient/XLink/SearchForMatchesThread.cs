@@ -11,7 +11,7 @@ using Org.Openengsb.Loom.CSharp.Bridge.Implementation.Communication;
 namespace Org.Openengsb.XLinkCSharpClient.XLink
 {
     /// <summary>
-    /// TODO TBW
+    /// Threadclass to trigger the search for XLink matches
     /// </summary>
     class SearchForMatchesThread
     {
@@ -23,7 +23,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Searches for Matches to incomming XLinks, in the local WorkingDirectory
         /// </summary>
         public void searchForMatchesThread()
         {

@@ -26,7 +26,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             //Regex to fetch Data
             Regex classRegex = new Regex(@".*class ([a-zA-Z0-9_]+).*");
             Regex packageRegex = new Regex(@".*namespace ([a-zA-Z0-9_\.]+).*");
-            Regex varRegex = new Regex(@" *(public|protected|private|bool) (int|double|float|string|DateTime) ([a-zA-Z0-9_]+) {.*");
+            Regex varRegex = new Regex(@" *(public|protected|private) (int|double|float|string|DateTime|bool|long) ([a-zA-Z0-9_]+) {.*");
 
             OOClass resultingInstance = new OOClass();
             List<OOVariable> variables = new List<OOVariable>();
