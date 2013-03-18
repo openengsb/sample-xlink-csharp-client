@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CsharpSampleClient
 {
-    class Production_ Plan
+    class Production_Plan
     {
         public long pm_Id { get; set; }
         public string planName { get; set; }

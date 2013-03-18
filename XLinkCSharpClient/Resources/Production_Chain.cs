@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CsharpSampleClient
 {
-    class Production_ Chain
+    class Production_Chain
     {
         public long cm_Id { get; set; }
         public string nameOfChain { get; set; }
