@@ -162,17 +162,6 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             for (int i = 0; i < newArryOfInstalledTools.Length; i++)
             {
                 convertedArray[i] = newArryOfInstalledTools[i].ConvertOSBType<OpenEngSBCore.XLinkConnector>();
-                /*unterschiedliche DLLS deshalb andere typen
-                 * convertedArray[i].id = newArryOfInstalledTools[i].id;
-                convertedArray[i].toolName = newArryOfInstalledTools[i].toolName;
-                convertedArray[i].availableViews = new OOSourceCodeDomain.XLinkConnectorView[newArryOfInstalledTools[i].availableViews.Length];
-                for (int e = 0; e < newArryOfInstalledTools[i].availableViews.Length; e++)
-                {
-                    convertedArray[i].availableViews[e].viewId = newArryOfInstalledTools[i].availableViews[e].viewId;
-                    convertedArray[i].availableViews[e].name = newArryOfInstalledTools[i].availableViews[e].name;
-                    // set available views map - unterschiedliche DLLS deshalb andere typen
-                    //convertedArray[i].availableViews[e].descriptions = newArryOfInstalledTools[i].availableViews[e].descriptions;
-                }*/
             }
             return convertedArray;
         }
@@ -335,7 +324,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Returns the XLinkConnector entry to the given programname or null
         /// </summary>
         private OpenEngSBCore.XLinkConnector findCurrentlyInstalledToolToName(String programname)
         {
@@ -354,7 +343,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
         }
 
         /// <summary>
-        /// TODO TBW
+        /// Returns the XLinkConnectorView entry to the given XLinkConnector and viewId or null
         /// </summary>
         private OpenEngSBCore.XLinkConnectorView findViewToCurrentlyInstalledTool(OpenEngSBCore.XLinkConnector otherLocalTool, string viewId)
         {

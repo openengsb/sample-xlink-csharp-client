@@ -224,7 +224,7 @@ namespace Org.Openengsb.XLinkCSharpClient.SearchLogic
         /// First searches for matching filesnames.
         /// If no files where found or if more than one file was found, search for matching variables.
         /// </summary>
-        public void seachForXLinkMatches(OOClass potentialMatch)
+        public void searchForXLinkMatches(OOClass potentialMatch)
         {
             if (wdFiles.Count == 0)
             {

@@ -92,6 +92,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectoryBrowser\DirectoryBrowser.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Resources\Production_Plan.cs" />
+    <None Include="Resources\Address.cs" />
+    <None Include="Resources\Business_Order.cs" />
+    <None Include="Resources\Business_Policy.cs" />
+    <None Include="Resources\Customer.cs" />
+    <None Include="Resources\Facility_Machine.cs" />
+    <None Include="Resources\Facility_Output.cs" />
+    <None Include="Resources\Order_Position.cs" />
+    <None Include="Resources\Person.cs" />
+    <None Include="Resources\Position_Reference.cs" />
+    <None Include="Resources\Production_Chain.cs" />
+    <None Include="Resources\Production_Facility.cs" />
     <Compile Include="XLink\LinkingUtils.cs" />
     <Compile Include="XLink\OOSourceCodeConnector.cs" />
     <Compile Include="Program.cs" />
@@ -106,6 +123,12 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

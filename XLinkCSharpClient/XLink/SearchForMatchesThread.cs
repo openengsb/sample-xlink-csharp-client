@@ -31,7 +31,7 @@ namespace Org.Openengsb.XLinkCSharpClient.XLink
             {
                 IMarshaller marseller = new JsonMarshaller();
                 OOClass currentPotentialMatch = marseller.UnmarshallObject<OOClass>(matchingObjects[i].ToString());
-                Program.directoryBrowser.seachForXLinkMatches(currentPotentialMatch);
+                Program.directoryBrowser.searchForXLinkMatches(currentPotentialMatch);
             }
         }
     }
