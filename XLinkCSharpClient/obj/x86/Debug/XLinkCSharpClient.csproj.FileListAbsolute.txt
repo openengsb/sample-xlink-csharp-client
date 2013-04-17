@@ -1,6 +1,0 @@
-C:\Workspaces\SharpDevelop\XLinkCSharp\XLinkCSharpClient\obj\x86\Debug\ResolveAssemblyReference.cache
-C:\Workspaces\SharpDevelop\XLinkCSharp\XLinkCSharpClient\bin\Debug\XLinkCSharpClient.exe.config
-C:\Workspaces\SharpDevelop\XLinkCSharp\XLinkCSharpClient\bin\Debug\XLinkCSharpClient.exe
-C:\Workspaces\SharpDevelop\XLinkCSharp\XLinkCSharpClient\bin\Debug\XLinkCSharpClient.pdb
-C:\Workspaces\SharpDevelop\XLinkCSharp\XLinkCSharpClient\obj\x86\Debug\XLinkCSharpClient.exe
-C:\Workspaces\SharpDevelop\XLinkCSharp\XLinkCSharpClient\obj\x86\Debug\XLinkCSharpClient.pdb
