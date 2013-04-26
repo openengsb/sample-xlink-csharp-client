@@ -2,57 +2,86 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
-using System.Windows.Forms;
 
-using XLinkCSharpClient.Model;
+using Org.Openengsb.XLinkCSharpClient.XLink;
+using Org.Openengsb.XLinkCSharpClient.SearchLogic;
 
-namespace XLinkCSharpClient
+namespace Org.Openengsb.XLinkCSharpClient
 {
+    /// <summary>
+    /// Programm entry point. Controlls the user interaction.
+    /// </summary>
     class Program
     {
-        /**program exit codes - constant*/
+        /*program exit codes - constant*/
         private static readonly int EXIT_SUCCESS = 0;
-        /**program exit codes - constant*/
         private static readonly int EXIT_FAILURE = 1;
-        /**Programname for usage()*/
+
+        /*Programname for usage()*/
         private static readonly string programname = "XLinkCSharpClient";
 
-        private static readonly string[] supportedFileTypes = { "java", "cs" };
-        private static string workingDirectory;
-        private static string filetype = "java";
-        private static List<WorkingDirectoryFile> wdFiles;
-        private static String openengsbContext;
+        /*Program language*/
+        public static readonly string locale = "en";
+
+        /*Logic to browse the WorkingDirectory*/
+        public static DirectoryBrowser directoryBrowser;
+
+        /*Context to be used at the OpenEngSB*/
+        private static String openengsbContext = "foo";
+
+        /*ConnectionManager to the OpenEngSB, also creates XLinks*/
+        public static OpenEngSBConnectionManager openengsbConnectionManager;
+
+        /*XLink Properties*/
+        private static string domainId = "oosourcecode";
+        private static string xlinkServerURL = "tcp://localhost.:6549";
+        private static string hostIp = "127.0.0.1";
+        public static string viewId = "C#SourceCode";
+        private static string classNameOfOpenEngSBModel = "org.openengsb.domain.OOSourceCode.model.OOClass";
+
 
         [STAThread]
         static int Main(string[] args)
         {
-            if(args.Length < 2){
-                exitProgramWithError("Missing Parameter\nUsage: " + programname + " {workingDirectory} {openengsb.context}");
+            OpenEngSBConnectionManager.initInstance(xlinkServerURL, domainId, programname, hostIp, classNameOfOpenEngSBModel, openengsbContext);
+            openengsbConnectionManager = OpenEngSBConnectionManager.getInstance();
+            directoryBrowser = new DirectoryBrowser();
+
+            if(args.Length < 1){
+                exitProgramWithError("Missing Parameter\nUsage: " + programname + " {workingDirectory}");
             }
-            if (!setWorkingDirectory(args[0]))
+            if (!directoryBrowser.setWorkingDirectory(args[0]))
             {
                 exitProgramWithError("Supplied Path \"" + args[0] + "\" is not a directory.");
             }
-            setOpenEngSBContext(args[1]);
+            openengsbContext = args[1];
+            printWelcomeInformation();
+           
+            connectToOpenEngSBAndRegisterForXLink();
 
-            outputLine("Modelclass Browser is running.");
-            processDisplayWD();
-            processDisplayFT();
-            displaySupportedFT();
-            processReload();
-            Console.Write("Insert your command:");
+            outputLine("Insert your command:");
 
             String line;
             while ((line = Console.ReadLine()) != null)
             {
                 if (line.StartsWith("changeWD"))
                 {
-                    processChangeWD(line);
+                    string[] lineParams = line.Split(' ');
+                    if (lineParams.Length < 2)
+                    {
+                        outputLine("changeWD <directoryPath> - directoryPath is missing");
+                        continue;
+                    }
+                    string param = lineParams[1];
+                    if (directoryBrowser.setWorkingDirectory(param))
+                    {
+                        outputLine("WorkingDirectory changed.");
+                        directoryBrowser.reloadListOfWorkingDirectoryFiles();
+                    }           
                 }
                 else if (line.Equals("displayWD"))
                 {
-                    processDisplayWD();
+                    directoryBrowser.displayWorkingDirectory();
                 }
                 else if (line.Equals("help"))
                 {
@@ -60,27 +89,39 @@ namespace XLinkCSharpClient
                 }
                 else if (line.StartsWith("changeFT"))
                 {
-                    processChangeFT(line);
+                    string[] lineParams = line.Split(' ');
+                    if (lineParams.Length < 2)
+                    {
+                        outputLine("changeFT <filetype> - filetype is missing");
+                        continue;
+                    }
+                    directoryBrowser.changeFileType(lineParams[1]);
                 }
                 else if (line.Equals("displayFT"))
                 {
-                    processDisplayFT();
+                    directoryBrowser.displaySupportedFileTypes();
                 }
                 else if (line.Equals("displaySupportedFT"))
                 {
-                    processDisplayFT();
+                    directoryBrowser.displaySupportedFileTypes();
                 }
                 else if (line.Equals("list"))
                 {
-                    processList();
+                    directoryBrowser.displayListOfWorkingDirectoryFiles();
                 }
                 else if (line.Equals("reload"))
                 {
-                    processReload();
+                    directoryBrowser.reloadListOfWorkingDirectoryFiles();
                 }
                 else if (line.StartsWith("open"))
                 {
-                    processOpen(line);
+                    string[] lineParams = line.Split(' ');
+                    if (lineParams.Length < 2)
+                    {
+                        outputLine("open <filename> - filename is missing");
+                        continue;
+                    }
+                    directoryBrowser.openFile(lineParams[1]);
                 }
                 else if (line.StartsWith("exit"))
                 {
@@ -88,219 +129,144 @@ namespace XLinkCSharpClient
                 }
                 else if (line.StartsWith("xlink"))
                 {
-                    processXLink(line);
+                    if(!openengsbConnectionManager.isConnected())
+                    {
+                        outputLine("No connection to the OpenEngSB.");
+                        continue;
+                    }
+                    string[] lineParams = line.Split(' ');
+                    if (lineParams.Length < 2)
+                    {
+                        outputLine("xlink <filename> - filename is missing");
+                        continue;
+                    }
+                    directoryBrowser.createXLinkFromFileString(lineParams[1]);
+                }
+                else if (line.Equals("listLocalSwitch"))
+                {
+                    if (!openengsbConnectionManager.isConnected())
+                    {
+                        outputLine("No connection to the OpenEngSB.");
+                        continue;
+                    }
+                    openengsbConnectionManager.listOtherLocalInstalledSoftwareTools();
+                }
+                else if (line.StartsWith("localSwitch"))
+                {
+                    if (!openengsbConnectionManager.isConnected())
+                    {
+                        outputLine("No connection to the OpenEngSB.");
+                        continue;
+                    }
+                    string[] lineParams = line.Split(' ');
+                    if (lineParams.Length < 4)
+                    {
+                        outputLine("missin parameters. Insert 'help' for usage.");
+                        continue;
+                    }
+                    openengsbConnectionManager.triggerLocalSwitch(lineParams[1], lineParams[2], lineParams[3]);
                 }
                 else
                 {
-                    outputLine("Unknown command \""+line+"\".\nType \"help\" to list all commands.");
+                    outputLine("Unknown command \"" + line + "\".\nType \"help\" to list all commands.");
                 }
-                Console.Write("Insert your command:");
+                outputLine("\nInsert your command:");
             }
 			exitProgramWithSucces();
 			return 0;
         }
-        
+
+        /// <summary>
+        /// Prints general program Information and loads the Files from the Working Directory
+        /// </summary>
+        private static void printWelcomeInformation()
+        {
+            outputLine("C# Model Browser is running.");
+            directoryBrowser.displayWorkingDirectory();
+            directoryBrowser.displaySupportedFileTypes();
+            directoryBrowser.displaycurrentFileType();
+            directoryBrowser.reloadListOfWorkingDirectoryFiles();
+        }
+
+        /// <summary>
+        /// Tries to connect to the OpenEngSB. Catches possible Exceptions.
+        /// </summary>
+        private static void connectToOpenEngSBAndRegisterForXLink()
+        {
+            try
+            {
+                openengsbConnectionManager.connectToOpenEngSbWithXLink();
+            }
+            catch
+            {
+                outputLine("Connect failed.");
+            }
+        }
+
+        /// <summary>
+        /// Tries to disconnect from the OpenEngSB. Catches possible Exceptions.
+        /// </summary>
+        private static void disconnectFromXLinkAndOpenEngSB()
+        {
+            if (!openengsbConnectionManager.isConnected())
+            {
+                return;
+            }
+            try
+            {
+                openengsbConnectionManager.disconnect();
+            }
+            catch
+            {
+                outputLine("Disconnect failed.");
+            }
+        }
+
+        /// <summary>
+        /// Prints the given ErrorMsg. Disconnects from the OpenEngSB and exits.
+        /// </summary>
         private static void exitProgramWithSucces(){
             outputLine("Program is closing.");
-            Console.WriteLine("Press any key to close...");
+            disconnectFromXLinkAndOpenEngSB();
+            outputLine("Press any key to close...");
             Console.ReadKey();
             System.Environment.Exit(EXIT_SUCCESS);      	
         }
 
+        /// <summary>
+        /// Prints the given ErrorMsg. Disconnects from the OpenEngSB and exits with an error code.
+        /// </summary>
         private static void exitProgramWithError(String errorMsg){
             outputLine(errorMsg);
-            Console.WriteLine("Press any key to close...");
+            disconnectFromXLinkAndOpenEngSB();
+            outputLine("Press any key to close...");
             Console.ReadKey();
             System.Environment.Exit(EXIT_FAILURE);    	
         }        
 
+        /// <summary>
+        /// Prints the list of available commands.
+        /// </summary>
         private static void processHelp()
         {
-            outputLine("Available Commands:");
-            outputLine("\tchangeFT <filetype> - changes the current Filetype, must be a supported filetype");
-            outputLine("\n\tchangeWD <directoryPath> - changes the current WorkingDirectory, must be a correct directoryPath");
-            outputLine("\n\tdisplayFT - displays the current filetype");
-            outputLine("\n\tdisplaySupportedFT - displays all supported filetypes");
-            outputLine("\n\tdisplayWD - displays the current WorkingDirectory");
-            outputLine("\n\texit - closes the program");
-            outputLine("\n\thelp - displays this help");
-            outputLine("\n\tlist - lists all files of the defined filetype in the workingDirectory");
-            outputLine("\n\topen <filename> - opens the given file in the standart editor");
-            outputLine("\n\treload - reloads filelist from the workingDirectory");
-            outputLine("\n\txlink <filename> - copies the xlink of the specified file to the clipboard"); 
-        }
+            outputLine("\nAvailable Commands:");
 
-        private static void processChangeWD(String line)
-        {
-            string[] lineParams = line.Split(' ');
-            if (lineParams.Length < 2)
-            {
-                outputLine("changeWD <directoryPath> - directoryPath is missing");
-                return;
-            }
-            string param = lineParams[1];
-            if (!setWorkingDirectory(param))
-            {
-                outputLine("Supplied Path \"" + param + "\" is not a directory.");
-            }
-            outputLine("WorkingDirectory changed.");
-            processReload();
-        }
+            /*Commented information about commands since they are not needed in controlled experiment*/
 
-        private static void processChangeFT(String line)
-        {
-            string[] lineParams = line.Split(' ');
-            if (lineParams.Length < 2)
-            {
-                outputLine("changeFT <filetype> - filetype is missing");
-                return;
-            }
-            string param = lineParams[1];
-            if (!setFileType(param))
-            {
-                outputLine("Supplied Filetype \"" + param + "\" is not supported.");
-            }
-            outputLine("FileType changed.");
-            processReload();
-        }
-
-        private static void processOpen(String line)
-        {
-            string[] lineParams = line.Split(' ');
-            if (lineParams.Length < 2)
-            {
-                outputLine("open <filename> - filename is missing");
-                return;
-            }
-            string param = lineParams[1];
-            WorkingDirectoryFile searchedFile = null;
-            foreach (WorkingDirectoryFile wdf in wdFiles)
-            {
-                if (wdf.fileName.Equals(param))
-                {
-                    searchedFile = wdf;
-                    break;
-                }
-            }
-
-            if (searchedFile != null)
-            {
-                outputLine("opening file...");
-                System.Diagnostics.Process.Start(searchedFile.wholePath);
-            }
-            else
-            {
-                outputLine("file was not found");
-            }
-            
-        }
-
-        private static void processXLink(String line)
-        {
-            string[] lineParams = line.Split(' ');
-            if (lineParams.Length < 2)
-            {
-                outputLine("xlink <filename> - filename is missing");
-                return;
-            }
-            string param = lineParams[1];
-            WorkingDirectoryFile searchedFile = null;
-            foreach (WorkingDirectoryFile wdf in wdFiles)
-            {
-                if (wdf.fileName.Equals(param))
-                {
-                    searchedFile = wdf;
-                    break;
-                }
-            }
-
-            if (searchedFile != null)
-            {
-                createXLink(searchedFile);
-                outputLine("xlink was copied to clipboard...");
-            }
-            else
-            {
-                outputLine("file was not found");
-            }
-
-        }
-
-        private static void processList()
-        {
-            if (wdFiles.Count != 0)
-            {
-                outputLine("Files of the working directory");
-            }
-            else
-            {
-                outputLine("There are no Files of the filetype in the working directory.");
-            }
-            foreach(WorkingDirectoryFile wdf in wdFiles){
-                outputLine(wdf.fileName + " (" + wdf.directoryOfFile + ")");
-            }
-        }
-
-        private static void processReload()
-        {
-            wdFiles = new List<WorkingDirectoryFile>();
-            string[] filePaths = Directory.GetFiles(workingDirectory, "*."+filetype, SearchOption.AllDirectories);
-            foreach (String file in filePaths)
-            {
-                wdFiles.Add(new WorkingDirectoryFile(file));
-            }
-            outputLine("FileList reloaded");
-        }
-
-        private static void processDisplayWD()
-        {
-            outputLine("The current WorkingDirectory is \"" + workingDirectory + "\"");
-        }
-
-        private static void processDisplayFT()
-        {
-            outputLine("The current filetype is \"" + filetype+"\"");
-        }
-
-        private static void displaySupportedFT()
-        {
-            string ft = supportedFileTypes[0];
-            for (int i = 1; i < supportedFileTypes.Length;i++)
-            {
-                ft += ", " +supportedFileTypes[i];
-            }
-            outputLine("Supported filetypes are {" + ft + "}");
-        }
-
-        private static bool setWorkingDirectory(String newWorkingDirectory)
-        {
-            if (Directory.Exists(newWorkingDirectory))
-            {
-                workingDirectory = newWorkingDirectory;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private static void setOpenEngSBContext(String context)
-        {
-            openengsbContext = context;
-        }
-
-        private static bool setFileType(String newFileType)
-        {
-            if (supportedFileTypes.Contains(newFileType))
-            {
-                filetype = newFileType;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            //outputLine("\nchangeFT <filetype> - changes the current Filetype, must be a supported filetype");
+            //outputLine("\nchangeWD <directoryPath> - changes the current WorkingDirectory, must be a correct directoryPath");
+            //outputLine("\ndisplayFT - displays the current filetype");
+            //outputLine("\ndisplaySupportedFT - displays all supported filetypes");
+            //outputLine("\ndisplayWD - displays the current WorkingDirectory");
+            outputLine("\nexit - closes the program");
+            outputLine("\nhelp - displays this help");
+            outputLine("\nlist - lists all files of the defined filetype in the workingDirectory");
+            outputLine("\nopen <filename> - opens the given file in the standard editor");
+            //outputLine("\nreload - reloads filelist from the workingDirectory");
+            outputLine("\nxlink <filename> - copies the xlink of the specified file to the clipboard");
+            outputLine("\nlistLocalSwitch - lists the name and views of all other localy installed software tools with xLink.");
+            outputLine("\nlocalSwitch <programname> <viewId> <filename> - triggers an immediate switch to the given software tools with the xlink of the given file.");
+            outputLine("");
         }
 
         private static void outputLine(string line)
@@ -308,41 +274,5 @@ namespace XLinkCSharpClient
             Console.WriteLine(line);
         }
 
-        /*transfere to real connector*/
-
-        private static void createXLink(WorkingDirectoryFile file)
-        {
-            String completeUrl = "dummyUrl"; //connector.getTemplate().getBaseUrl();
-            completeUrl += "&" + ""; //connector.getTemplate().getModelClassKey() + "=" + urlEncodeParameter(modelInformation.getModelClassName());
-            completeUrl += "&" + ""; //connector.getTemplate().getModelVersionKey() + "=" + urlEncodeParameter(modelInformation.getModelVersionString());
-            completeUrl += "&" + ""; //connector.getTemplate().getContextIdKeyName() + "=" + urlEncodeParameter(openEngSBContext);   
-            String classNameKey = "className";
-            completeUrl += "&" + classNameKey + "=" + ""; //selectedStmt.getTableName();
-            Clipboard.SetText(completeUrl);
-        }
-
-        private static void openXlink(String className)
-        {
-            processReload();
-            WorkingDirectoryFile searchedFile = null;
-            foreach (WorkingDirectoryFile wdf in wdFiles)
-            {
-                if (wdf.fileName.Equals(className))
-                {
-                    searchedFile = wdf;
-                    break;
-                }
-            }
-
-            if (searchedFile != null)
-            {
-                outputLine("opening file due to xlink call...");
-                System.Diagnostics.Process.Start(searchedFile.wholePath);
-            }
-            else
-            {
-                outputLine("openXLink was called with "+className+" but no match was found.");
-            }
-        }
     }
 }
